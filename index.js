@@ -51,7 +51,7 @@ export function apply(ctx) {
     name: 'office_dashboard',
     description: '生成办公室动画仪表盘 HTML（工作日志 + 产出物 + token 统计 + 办公室场景动画），写入指定目录并返回文件路径。适合在任务收尾时生成一份可视化工作汇报。',
     parameters: {
-      dir: { type: 'string', required: false, description: '输出目录（绝对路径），默认当前工作目录' },
+      dir: { type: 'string', required: true, description: '输出目录（绝对路径）' },
     },
     output: {
       schema: { type: 'object', additionalProperties: true },
@@ -88,7 +88,7 @@ export function apply(ctx) {
     name: 'office_log',
     description: '查询当前会话的工作日志（回合/步骤/用户消息/工具调用/助手消息），返回按时间正序的条目列表。',
     parameters: {
-      limit: { type: 'integer', required: false, description: '返回条数上限，默认 50' },
+      limit: { type: 'integer', required: true, description: '返回条数上限' },
     },
     output: {
       schema: { type: 'object', additionalProperties: true },
