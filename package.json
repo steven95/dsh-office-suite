@@ -1,0 +1,48 @@
+{
+  "name": "dsh-office-suite",
+  "version": "0.1.0",
+  "description": "DSH 办公室动画仪表盘：工作日志 / 产出物 / 预览 / token 统计，一键生成可独立打开的动画办公室 HTML",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "cordis",
+    "office",
+    "dashboard",
+    "worklog",
+    "deliverables",
+    "token-meter",
+    "animation"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "ios-SDF <1345266022@qq.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/steven95/dsh-office-suite.git"
+  },
+  "homepage": "https://github.com/steven95/dsh-office-suite",
+  "bugs": {
+    "url": "https://github.com/steven95/dsh-office-suite/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "license": "MIT"
+}

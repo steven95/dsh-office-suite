@@ -1,0 +1,7 @@
+# dsh-office-suite bundle 声明
+# name 必须是可导入的包名（npm 包名），loader 按它 import；插件内部 export const name 才是插件名
+# inject 声明插件依赖的 cordis 服务（tools）；sessionProjections 为可选能力，插件内用 ctx.inject 安全注入
+- insert:
+    - id: office-suite
+      name: dsh-office-suite
+      inject: [tools]
