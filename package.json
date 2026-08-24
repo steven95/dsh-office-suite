@@ -1,9 +1,14 @@
 {
   "name": "dsh-office-suite",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "DSH 办公室动画仪表盘：工作日志 / 产出物 / 预览 / token 统计，一键生成可独立打开的动画办公室 HTML",
   "type": "module",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
   "files": [
     "index.js",
     "lib",
@@ -38,6 +43,12 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime"
+      ],
+      "platform": "web"
     }
   },
   "peerDependencies": {

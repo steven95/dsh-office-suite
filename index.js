@@ -20,6 +20,24 @@ import { buildPreview, previewKind } from './lib/preview.js'
 
 export const name = 'dsh-office-suite'
 
+function json(res, status, value) {
+  const body = JSON.stringify(value)
+  res.writeHead(status, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Content-Length': Buffer.byteLength(body),
+  })
+  res.end(body)
+}
+
+function requireMethod(req, res, method) {
+  if (req.method !== method) {
+    res.writeHead(405, { Allow: method })
+    res.end()
+    return false
+  }
+  return true
+}
+
 export function apply(ctx) {
   // ---------- 投影单元（可选能力：headless 无 registry 时不受影响） ----------
   ctx.inject(['sessionProjections'], (projectionCtx) => {
@@ -27,6 +45,61 @@ export function apply(ctx) {
     projectionCtx.sessionProjections.register(officeDeliverablesDefinition)
     projectionCtx.sessionProjections.register(officeTokensDefinition)
   })
+
+  // ---------- 会话追踪 + HTTP API（webServer 可选能力，headless 无影响） ----------
+  const webServer = ctx.reflect.get('webServer', false)
+  console.log('[office-suite] webServer =', webServer ? 'available' : 'MISSING', '| sessionProjections =', ctx.reflect.get('sessionProjections', false) ? 'available' : 'MISSING')
+  if (webServer) {
+    let recentSession = null
+    const disposeEvents = [
+      ctx.on('session/event', (session) => {
+        recentSession = session
+      }),
+      ctx.on('session/disposed', (session) => {
+        if (recentSession === session) recentSession = null
+      }),
+    ]
+    const route = {
+      kind: 'exact',
+      path: '/api/office-suite/state',
+      handler: (req, res) => {
+        if (!requireMethod(req, res, 'GET')) return
+        const projections = ctx.reflect.get('sessionProjections', false)
+        let state = {
+          ok: true,
+          sessionId: null,
+          tokens: {},
+          log: [],
+          deliverables: [],
+          updatedAt: Date.now(),
+        }
+        if (recentSession && projections) {
+          try {
+            const snap = projections.snapshot(recentSession)
+            const values = snap?.values ?? {}
+            state = {
+              ok: true,
+              sessionId: recentSession.id ?? null,
+              tokens: values.officeTokens ?? {},
+              log: values.officeLog?.entries ?? [],
+              deliverables: values.officeDeliverables?.files ?? [],
+              updatedAt: Date.now(),
+            }
+          } catch {
+            /* 保持默认 state */
+          }
+        }
+        json(res, 200, state)
+      },
+    }
+    ctx.effect(() => {
+      const disposeRoute = webServer.register(route)
+      return () => {
+        for (const off of disposeEvents) off()
+        disposeRoute()
+      }
+    }, 'office-suite: http api')
+  }
 
   // ---------- 读取当前 session 的投影快照 ----------
   function readSnapshot(exec) {
